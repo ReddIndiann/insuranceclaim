@@ -1,19 +1,28 @@
 // app/signup/page.js
 'use client';
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '../firebase/config';
+import { useRouter } from 'next/navigation';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [createUserWithEmailAndPassword, user, loading, error] = useCreateUserWithEmailAndPassword(auth);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      sessionStorage.setItem('user', true);
+      router.push('/'); // Redirect to home page or any other page after successful signup
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await createUserWithEmailAndPassword(email, password);
-      sessionStorage.setItem.apply('user',true)
       setEmail('');
       setPassword('');
     } catch (err) {
@@ -24,7 +33,7 @@ export default function Signup() {
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center">
       <div className="bg-gray-800 p-24 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-white mb-6">Sign Up To Insurace Claim detection</h2>
+        <h2 className="text-2xl font-bold text-white mb-6">Sign Up To Insurance Claim Detection</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-300">
