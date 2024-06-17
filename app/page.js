@@ -1,10 +1,12 @@
 'use client';
+import Link from 'next/link';
 
 import { useEffect, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from './firebase/config'; // Adjust this import based on your firebase configuration
 import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
+import { FaPlusCircle, FaQuestionCircle, FaPhone, FaSignOutAlt } from 'react-icons/fa'; // Importing icons
 
 const Home = () => {
   const router = useRouter();
@@ -16,24 +18,24 @@ const Home = () => {
       // This code will only run on the client
       const storedUser = sessionStorage.getItem('user');
       setUserSession(storedUser);
-      if (!user && !storedUser) {
-        router.push('signup');
-      }
     }
-  }, [user, router]);
+  }, []);
 
   useEffect(() => {
-    // Redirect to sign-in page if user is not authenticated
-    if (!loading && !user) {
-      router.push('/signin'); // Replace with the actual path to your sign-in page
+    if (!loading) {
+      if (!user && !userSession) {
+        router.push('/signin');
+      } else if (!user) {
+        router.push('/signin');
+      }
     }
-  }, [loading, user, router]);
+  }, [loading, user, userSession, router]);
 
   const handleSignOut = async () => {
     try {
       await signOut(auth);
       sessionStorage.removeItem('user');
-      router.push('/'); // Redirect to home or sign-in page after sign-out
+      router.push('/signin'); // Redirect to sign-in page after sign-out
     } catch (error) {
       console.error('Sign out error', error);
       // Handle error state or feedback to user
@@ -45,20 +47,39 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-6">Welcome to Insurance Claim Detection</h1>
-        {user && (
-          <div className="text-center">
-            <p className="text-white">Welcome, {user.email}</p>
-            <button
-              onClick={handleSignOut}
-              className="mt-4 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500"
-            >
-              Sign Out
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white p-4">
+      <div className="w-full max-w-md mx-auto bg-gray-800 rounded-lg shadow-lg">
+        <div className="bg-blue-600 py-6 rounded-t-lg">
+          <h1 className="text-3xl font-bold text-center">Shift</h1>
+        </div>
+        <div className="bg-white py-8 px-6 rounded-b-lg text-center">
+          <h2 className="text-2xl font-semibold mb-6 text-gray-800">Welcome {user ? user.displayName : 'Guest'}!</h2>
+          <div className="space-y-6">
+          <Link href="/Details-entry" passHref>
+            <button className="w-full flex items-center justify-center px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-400">
+              <FaPlusCircle className="mr-2" />
+              New claim
             </button>
+            </Link>
+            <button className="w-full flex items-center justify-center px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-400">
+              <FaQuestionCircle className="mr-2" />
+              Get assistance
+            </button>
+            <button className="w-full flex items-center justify-center px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-400">
+              <FaPhone className="mr-2" />
+              Contact
+            </button>
+            {user && (
+              <button
+                onClick={handleSignOut}
+                className="w-full flex items-center justify-center px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-500"
+              >
+                <FaSignOutAlt className="mr-2" />
+                Sign Out
+              </button>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
