@@ -50,7 +50,7 @@ const Home = () => {
     <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white p-4">
       <div className="w-full max-w-md mx-auto bg-gray-800 rounded-lg shadow-lg">
         <div className="bg-blue-600 py-6 rounded-t-lg">
-          <h1 className="text-3xl font-bold text-center">Shift</h1>
+          <h1 className="text-3xl font-bold text-center">Isurance Claim</h1>
         </div>
         <div className="bg-white py-8 px-6 rounded-b-lg text-center">
           <h2 className="text-2xl font-semibold mb-6 text-gray-800">Welcome {user ? user.displayName : 'Guest'}!</h2>
