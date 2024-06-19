@@ -94,14 +94,26 @@
 
 
 'use client';
+// pages/dashboard.js// pages/dashboard.js
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useUser } from './hooks';
 
 export default function Dashboard() {
   const [activeNav, setActiveNav] = useState('home');
-  const { role } = useUser();
+  const { role, signOutUser } = useUser();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    try {
+      await signOutUser();
+      router.push('/signin');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -129,6 +141,14 @@ export default function Dashboard() {
             )}
           </ul>
         </nav>
+        <div className="p-6">
+          <button
+            onClick={handleSignOut}
+            className="w-full px-4 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+          >
+            Sign Out
+          </button>
+        </div>
       </aside>
       <main className="flex-1 bg-black-100 p-6">
         <h1 className="text-3xl font-bold mb-6">Welcome to the Dashboard</h1>

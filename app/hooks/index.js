@@ -1,7 +1,8 @@
+// contexts/UserContext.js
 'use client';
 import { createContext, useContext, useState, useEffect } from 'react';
 import { auth } from '../firebase/config';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
@@ -30,8 +31,19 @@ export function UserProvider({ children }) {
     return () => unsubscribe();
   }, []);
 
+  const signOutUser = () => {
+    signOut(auth)
+      .then(() => {
+        setUser(null);
+        setRole(null);
+      })
+      .catch((error) => {
+        console.error('Error signing out: ', error);
+      });
+  };
+
   return (
-    <UserContext.Provider value={{ user, role }}>
+    <UserContext.Provider value={{ user, role, signOutUser }}>
       {children}
     </UserContext.Provider>
   );
