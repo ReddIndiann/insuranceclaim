@@ -1,28 +1,35 @@
-// app/signup/page.js
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
-import { auth } from '../firebase/config';
+import { auth, db } from '../firebase/config';
 import { useRouter } from 'next/navigation';
+import { doc, setDoc } from 'firebase/firestore';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
   const [createUserWithEmailAndPassword, user, loading, error] = useCreateUserWithEmailAndPassword(auth);
   const router = useRouter();
 
   useEffect(() => {
-    if (user) {
-      sessionStorage.setItem('user', true);
-      router.push('/'); // Redirect to home page or any other page after successful signup
-    }
-  }, [user, router]);
+    const addUserToFirestore = async () => {
+      if (user && username) {
+        const userDoc = doc(db, 'users', user.user.uid);
+        await setDoc(userDoc, { username: username, role: 'user' });
+        sessionStorage.setItem('user', true);
+        router.push('/'); // Redirect to home page or any other page after successful signup
+      }
+    };
+    addUserToFirestore();
+  }, [user, router, username]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await createUserWithEmailAndPassword(email, password);
+      // Don't clear the username state here
       setEmail('');
       setPassword('');
     } catch (err) {
@@ -44,6 +51,19 @@ export default function Signup() {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 bg-gray-700 text-gray-300 border border-gray-600 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="username" className="block text-sm font-medium text-gray-300">
+              Username
+            </label>
+            <input
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="mt-1 block w-full px-3 py-2 bg-gray-700 text-gray-300 border border-gray-600 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               required
             />
